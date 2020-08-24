@@ -11,7 +11,7 @@ export default {
     pattern: /^[\w-]+\d+\.[tj]s$/,
   },
   dbName: 'lireddit',
-  user: 'stneto',
+  user: 'postgres',
   password: 'neto',
   type: 'postgresql',
   debug: !__prod__,
