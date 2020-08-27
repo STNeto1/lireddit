@@ -16,7 +16,7 @@ import { UserResolver } from './resolvers/user'
 import { User } from './entities/User'
 import { Post } from './entities/Post'
 
-// rerun
+// comment
 const main = async () => {
   const conn = await createConnection({
     type: 'postgres',
@@ -30,6 +30,8 @@ const main = async () => {
   })
 
   await conn.runMigrations()
+
+  // await Post.delete({})
 
   const app = express()
 
