@@ -7,6 +7,7 @@ import session from 'express-session'
 import connectRedis from 'connect-redis'
 import cors from 'cors'
 import { createConnection } from 'typeorm'
+import path from 'path'
 
 import { __prod__, COOKIE_NAME } from './constants'
 import { HelloResolver } from './resolvers/hello'
@@ -15,6 +16,7 @@ import { UserResolver } from './resolvers/user'
 import { User } from './entities/User'
 import { Post } from './entities/Post'
 
+// rerun
 const main = async () => {
   const conn = await createConnection({
     type: 'postgres',
@@ -23,8 +25,11 @@ const main = async () => {
     password: 'neto',
     logging: true,
     synchronize: true,
+    migrations: [path.join(__dirname, './migrations/*')],
     entities: [User, Post],
   })
+
+  await conn.runMigrations()
 
   const app = express()
 
