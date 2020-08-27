@@ -15,7 +15,6 @@ const Index = () => {
         <Link>create post</Link>
       </NextLink>
 
-      <div>hello world</div>
       <br />
       {!data ? (
         <div>loading...</div>
