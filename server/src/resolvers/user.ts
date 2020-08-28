@@ -6,6 +6,8 @@ import {
   Ctx,
   ObjectType,
   Query,
+  FieldResolver,
+  Root,
 } from 'type-graphql'
 import argon2 from 'argon2'
 import { v4 } from 'uuid'
@@ -35,8 +37,19 @@ class UserResponse {
   user?: User
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    // its the current user and its ok to show them the email
+    if (req.session.userId === user.id) {
+      return user.email
+    }
+
+    // current user wants to see someone elses email
+    return ''
+  }
+
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg('token') token: string,
