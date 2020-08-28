@@ -17,6 +17,7 @@ import { Post } from '../entities/Post'
 import { getConnection } from 'typeorm'
 import { MyContext } from '../types'
 import { isAuth } from '../middleware/isAuth'
+import { Updoot } from '../entities/Updoot'
 
 @InputType()
 class PostInput {
@@ -41,6 +42,41 @@ export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
     return root.text.slice(0, 50)
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg('postId', () => Int) postId: number,
+    @Arg('value', () => Int) value: number,
+    @Ctx() { req }: MyContext
+  ) {
+    const isUpdoot = value !== -1
+    const _value = isUpdoot ? 1 : -1
+    const { userId } = req.session
+
+    // await Updoot.insert({
+    //   userId,
+    //   postId,
+    //   value: _value,
+    // })
+
+    await getConnection().query(
+      `
+      START TRANSACTION;
+
+      insert into updoot ("userId", "postId", value)
+      values(${userId}, ${postId}, ${_value});
+
+      update post
+      set points = points + ${_value}
+      where id = ${postId};
+
+      COMMIT;
+    `
+    )
+
+    return true
   }
 
   @Query(() => PaginatedPosts)
