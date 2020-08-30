@@ -17,12 +17,11 @@ import { User } from './entities/User'
 import { Post } from './entities/Post'
 import { Updoot } from './entities/Updoot'
 
-// comment
 const main = async () => {
   const conn = await createConnection({
     type: 'postgres',
     database: 'lireddit2',
-    username: 'postgres',
+    username: 'stneto',
     password: 'neto',
     logging: true,
     synchronize: true,
