@@ -13,7 +13,7 @@ import { withUrqlClient } from 'next-urql'
 import NextLink from 'next/link'
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
-import { usePostsQuery } from '../generated/graphql'
+import { usePostsQuery, useDeletePostMutation } from '../generated/graphql'
 import { createUrqlClient } from '../utils/createUrqlClient'
 import { UpdootSection } from '../components/UpdootSection'
 
@@ -27,6 +27,8 @@ const Index = () => {
     variables,
   })
 
+  const [, deletePost] = useDeletePostMutation()
+
   if (!fetching && !data) {
     return <div>You query failed for some reason</div>
   }
@@ -37,22 +39,37 @@ const Index = () => {
         <div>loading...</div>
       ) : (
         <Stack spacing={8}>
-          {data!.posts.posts.map((p) => (
-            <Flex p={5} shadow="md" borderWidth="1px" key={p.id}>
-              <UpdootSection post={p} />
+          {data!.posts.posts.map((p) =>
+            !p ? null : (
+              <Flex p={5} shadow="md" borderWidth="1px" key={p.id}>
+                <UpdootSection post={p} />
 
-              <Box>
-                <NextLink href="/post/[id]" as={`/post/${p.id}`}>
-                  <Link>
-                    <Heading fontSize="xl">{p.title}</Heading>
-                  </Link>
-                </NextLink>
+                <Box flex={1}>
+                  <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                    <Link>
+                      <Heading fontSize="xl">{p.title}</Heading>
+                    </Link>
+                  </NextLink>
 
-                <Text>posted by {p.creator.username}</Text>
-                <Text>{p.textSnippet}</Text>
-              </Box>
-            </Flex>
-          ))}
+                  <Text>posted by {p.creator.username}</Text>
+                  <Flex align="center">
+                    <Text flex={1} mt={4}>
+                      {p.textSnippet}
+                    </Text>
+                    <IconButton
+                      ml="auto"
+                      variantColor="red"
+                      icon="delete"
+                      aria-label="Delete Post"
+                      onClick={() => {
+                        deletePost({ id: p.id })
+                      }}
+                    />
+                  </Flex>
+                </Box>
+              </Flex>
+            )
+          )}
         </Stack>
       )}
 
